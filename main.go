@@ -12,13 +12,16 @@ import (
 // DEFAULTTIMELIMIT sets the default time limit for the quiz
 const DEFAULTTIMELIMIT = 30 //seconds
 
+// DEFAULTCSVFILE sets the default csv file for the program to read from
+const DEFAULTCSVFILE = "problems.csv"
+
 type problem struct {
 	question string
 	answer   string
 }
 
 func main() {
-	fileName := flag.String("csv", "problems.csv", "file with math questions in format 'question,answer'")
+	fileName := flag.String("csv", "problems.csv", "file with questions in format 'question,answer'")
 	quizTimeLimit := flag.Int("limit", DEFAULTTIMELIMIT, "the time limit for the quiz")
 
 	flag.Parse()
@@ -55,7 +58,7 @@ func main() {
 			fmt.Printf("\nIn total you scored %d out of %d \n", correct, len(problems))
 			return
 		case answer := <-answerCh:
-			if answer == p.answer {
+			if RemoveSpaceAndLowerCase(answer) == RemoveSpaceAndLowerCase(p.answer) {
 				correct++
 			}
 		}
@@ -79,4 +82,9 @@ func parseLines(lines [][]string) []problem {
 func exit(msg string) {
 	fmt.Println(msg)
 	os.Exit(1)
+}
+
+// RemoveSpaceAndLowerCase removes white space and lowercases the input string
+func RemoveSpaceAndLowerCase(s string) string {
+	return strings.TrimSpace(strings.ToLower(s))
 }
