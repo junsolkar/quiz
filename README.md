@@ -14,6 +14,9 @@ The CSV file is in a format like below, where the first column is a question and
 5+8,13
 7+3,10
 1+1,2
+Capital of france,paris
+Capital of germany,berlin
+Capital of belguim,brussels
 ```
 
 At the end of the quiz the program outputs the total number of questions correct and how many questions there were in total. Questions given invalid answers are considered incorrect.
