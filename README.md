@@ -19,6 +19,4 @@ The CSV file is in a format like below, where the first column is a question and
 At the end of the quiz the program outputs the total number of questions correct and how many questions there were in total. Questions given invalid answers are considered incorrect.
 
 ## Futher implementation
-
-1. Add string trimming and cleanup to help ensure that correct answers with extra whitespace, capitalization, etc are not considered incorrect. 
-2. Add an option (a new flag) to shuffle the quiz order each time it is run.
+1. Add an option (a new flag) to shuffle the quiz order each time it is run.
