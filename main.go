@@ -21,7 +21,7 @@ type problem struct {
 }
 
 func main() {
-	fileName := flag.String("csv", "problems.csv", "file with questions in format 'question,answer'")
+	fileName := flag.String("csv", DEFAULTCSVFILE, "file with questions in format 'question,answer'")
 	quizTimeLimit := flag.Int("limit", DEFAULTTIMELIMIT, "the time limit for the quiz")
 
 	flag.Parse()
@@ -42,29 +42,9 @@ func main() {
 	timer := time.NewTimer(time.Duration(*quizTimeLimit) * time.Second)
 	defer timer.Stop()
 
-	correct := 0
-	for i, p := range problems {
-		fmt.Printf("Problems #%d: %s = ", i+1, p.question)
+	correct := AnswerProblem(problems, timer)
 
-		answerCh := make(chan string)
-
-		go func() {
-			var answer string
-			fmt.Scanf("%s\n", &answer)
-			answerCh <- answer
-		}()
-		select {
-		case <-timer.C:
-			fmt.Printf("\nIn total you scored %d out of %d \n", correct, len(problems))
-			return
-		case answer := <-answerCh:
-			if RemoveSpaceAndLowerCase(answer) == RemoveSpaceAndLowerCase(p.answer) {
-				correct++
-			}
-		}
-	}
-
-	fmt.Printf("In total you scored %d out of %d \n", correct, len(problems))
+	fmt.Printf("\nIn total you scored %d out of %d \n", correct, len(problems))
 }
 
 func parseLines(lines [][]string) []problem {
@@ -73,7 +53,7 @@ func parseLines(lines [][]string) []problem {
 	for i, line := range lines {
 		ret[i] = problem{
 			question: line[0],
-			answer:   strings.TrimSpace(line[1]),
+			answer:   RemoveSpaceAndLowerCase(line[1]),
 		}
 	}
 	return ret
@@ -87,4 +67,30 @@ func exit(msg string) {
 // RemoveSpaceAndLowerCase removes white space and lowercases the input string
 func RemoveSpaceAndLowerCase(s string) string {
 	return strings.TrimSpace(strings.ToLower(s))
+}
+
+// AnswerProblem will read through the array of problems and calculate how many were correct
+func AnswerProblem(problemList []problem, timer *time.Timer) int {
+	correct := 0
+	for i, p := range problemList {
+		fmt.Printf("Problem #%d: %s = ", i+1, p.question)
+
+		answerCh := make(chan string)
+
+		go func() {
+			var answer string
+			fmt.Scanf("%s\n", &answer)
+			answerCh <- answer
+		}()
+		select {
+		case <-timer.C:
+			return correct
+		case answer := <-answerCh:
+			if RemoveSpaceAndLowerCase(answer) == RemoveSpaceAndLowerCase(p.answer) {
+				correct++
+			}
+		}
+	}
+
+	return correct
 }
